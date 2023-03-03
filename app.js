@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require('fs/promises')
 const path = require('path')
 //
 // // fs.mkdir('./users', (err)=>{
@@ -45,18 +45,34 @@ const path = require('path')
 // fs.mkdir(path.join('girls'), (err) => {
 //     if (err) throw new Error(err.message)
 // })
+const foo = async () => {
+    const files = await fs.readdir(path.join(__dirname, 'boys'))
 
-fs.readdir((path.join('boys')), (err, files) => {
-    files.forEach(file => {
-        fs.readFile(path.join(file), (err, data) => {
-            console.log(err);
-            const x = JSON.parse(data)
-            if(x.gender === 'female'){
-                fs.rename(path.join('boys', 'girls'), (err) => {
-                    console.log(err);
-                })
-            }
-        })
-    })
-})
+    for (const file of files) {
+        const filePath = path.join(__dirname, 'boys', file)
+        const data = await fs.readFile(path.join(__dirname, 'boys', file))
+        const buffer = data.toString()
+        const user = JSON.parse(buffer)
+        if(user.gender === 'female'){
+            await fs.rename(filePath, path.join(__dirname, 'girls', file))
+        }
+    }
+}
+foo()
 
+
+const foo1 = async () => {
+    const files = await fs.readdir(path.join(__dirname, 'girls'))
+
+    for (const file of files) {
+        const filePath = path.join(__dirname, 'girls', file)
+        const data = await fs.readFile(path.join(__dirname, 'girls', file))
+        const buffer = data.toString()
+        const user = JSON.parse(buffer)
+        if(user.gender === 'male'){
+            await fs.rename(filePath, path.join(__dirname, 'boys', file))
+        }
+    }
+}
+
+foo1()
