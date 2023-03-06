@@ -39,8 +39,6 @@
 //     .on('error', handleError)
 //     .pipe(writeStream)
 
-
-const path = require("node:path");
 const express = require('express')
 const fsService = require('./fs.service')
 
@@ -56,13 +54,24 @@ app.use(express.urlencoded({extended: true}))
 // })
 
 app.post('/users', async (req, res) => {
-    const body = req.body
+    const {name, age, gender} = req.body
     const users = await fsService.reader()
 
-    users.push(body)
+    if(!name || name.length < 2){
+        res.status(400).json('Wrong name')
+    }
+    if(!age || !Number.isInteger(age) || Number.isNaN(age)){
+        res.status(400).json('Wrong age')
+    }
+    if(!gender || (gender !== 'male' && gender !== 'female')){
+        res.status(400).json('Wrong gender')
+    }
+
+    const newUser = {id: users[users.length - 1].id + 1 || 1, name, age, gender}
+    users.push(newUser)
     await fsService.writer(users)
 
-    res.status(201).json(body)
+    res.status(201).json(newUser)
 })
 
 app.get('/users', async (req, res) => {
@@ -70,33 +79,56 @@ app.get('/users', async (req, res) => {
     res.status(200).send(users)
 })
 
-app.get('/users/:userId', (req, res) => {
+app.get('/users/:userId', async (req, res) => {
     const {userId} = req.params
-    const user = users[+userId]
-    res.json(user)
+    const users = await fsService.reader()
+    const user = users.find((user) => user.id === +userId)
+
+    if(!user){
+        res.status(400).json(`User with id: ${userId} not found`)
+    }
+
+    res.status(200).json(user)
 })
 
 
-app.put('/users/:userId', (req, res) => {
+app.put('/users/:userId', async (req, res) => {
     const {userId} = req.params
-    const updateUser = req.body
+    const {name, age, gender} = req.body
 
-    users[+userId] = updateUser
+    if(name && name.length < 2){
+        res.status(400).json('Wrong name')
+    }
+    if(age && !Number.isInteger(age) || Number.isNaN(age)){
+        res.status(400).json('Wrong age')
+    }
+    if(gender && (gender !== 'male' && gender !== 'female')){
+        res.status(400).json('Wrong gender')
+    }
 
-    req.status.json({
-        message: 'User updated',
-        data: users[+userId]
-    })
+    const users = await fsService.reader()
+    const index = users.findIndex((user) => user.id === +userId)
+
+    users[index] = {...users[index], ...req.body}
+
+    await fsService.writer(users)
+
+    res.status(201).json(users[index])
 })
 
-app.delete('/users/:userId', (req, res) => {
+app.delete('/users/:userId', async (req, res) => {
     const {userId} = req.params
 
-    users.splice(+userId, 1)
+    const users = await fsService.reader()
+    const index = users.findIndex((user) => user.id === +userId)
+    if(index === -1){
+        res.status(422).json(`User with id: ${userId} not found`)
+    }
 
-    res.json({
-        message: 'User deleted'
-    })
+    users.splice(index, 1)
+
+    await fsService.writer(users)
+    res.sendStatus(204)
 })
 
 app.listen(PORT, () => {
