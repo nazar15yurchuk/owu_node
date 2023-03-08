@@ -28,10 +28,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const mongoose = __importStar(require("mongoose"));
+const user_router_1 = require("./routers/user.router");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
+app.use("/users", user_router_1.userRouter);
+app.use((err, req, res, next) => {
+    res.json({
+        message: err.message,
+    });
+});
 const PORT = 5100;
 app.listen(PORT, () => {
-    mongoose.connect("mongodb://127.0.0.1:27017/sept-2022");
+    mongoose.connect("mongodb://127.0.0.1:27017/sept-2022").then();
 });
