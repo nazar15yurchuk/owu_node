@@ -10,8 +10,3 @@ export interface IUser {
   password: string;
   gender: string;
 }
-
-export interface ICommonResponse<T> {
-  message: string;
-  data: T;
-}

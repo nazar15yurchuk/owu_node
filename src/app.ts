@@ -2,10 +2,10 @@ import { config } from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import * as mongoose from "mongoose";
 
+config();
+import { configs } from "./configs/config";
 import { userRouter } from "./routers/user.router";
 import { IError } from "./types/common.types";
-
-config();
 
 const app = express();
 
@@ -24,7 +24,7 @@ app.use((err: IError, req: Request, res: Response, next: NextFunction) => {
 
 console.log(process.env.PORT);
 
-app.listen(process.env.PORT, () => {
-  mongoose.connect("mongodb://127.0.0.1:27017/sept-2022").then();
-  console.log(`Server has started on PORT ${process.env.PORT}`);
+app.listen(configs.PORT, () => {
+  mongoose.connect(configs.DB_URL).then();
+  console.log(`Server has started on PORT ${configs.PORT}`);
 });
