@@ -1,27 +1,40 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import { User } from "../models/User.module";
 import { ICommonResponse, IUser } from "../types/user.types";
 
 class UserController {
-  public async getAll(req: Request, res: Response): Promise<Response<IUser[]>> {
-    const users = await User.find();
+  public async getAll(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response<IUser[]>> {
+    try {
+      const users = await User.find();
 
-    return res.json(users);
+      return res.json(users);
+    } catch (e) {
+      next(e);
+    }
   }
-  public async getById(req: Request, res: Response): Promise<Response<IUser>> {
+  public async getById(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response<IUser>> {
     try {
       const { userId } = req.params;
       const user = await User.findById(userId);
 
       return res.json(user);
     } catch (e) {
-      res.json({ message: e.message });
+      next(e);
     }
   }
   public async create(
     req: Request,
-    res: Response
+    res: Response,
+    next: NextFunction
   ): Promise<Response<ICommonResponse<IUser>>> {
     try {
       const body = req.body;
@@ -32,12 +45,13 @@ class UserController {
         data: user,
       });
     } catch (e) {
-      res.json({ message: e.message });
+      next(e);
     }
   }
   public async update(
     req: Request,
-    res: Response
+    res: Response,
+    next: NextFunction
   ): Promise<Response<ICommonResponse<IUser>>> {
     try {
       const { userId } = req.params;
@@ -50,7 +64,7 @@ class UserController {
         data: updateUser,
       });
     } catch (e) {
-      res.json({ message: e.message });
+      next(e);
     }
   }
   public async delete(req: Request, res: Response): Promise<Response<IUser>> {
