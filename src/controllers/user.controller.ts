@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import { User } from "../models/User.module";
 import { userService } from "../services/user.service";
-import { ICommonResponse, IMessage } from "../types/common.types";
+import { ICommonResponse } from "../types/common.types";
 import { IUser } from "../types/user.types";
 
 class UserController {
@@ -25,8 +25,7 @@ class UserController {
     next: NextFunction
   ): Promise<Response<IUser>> {
     try {
-      const { userId } = req.params;
-      const user = await userService.getById(userId);
+      const { user } = res.locals;
 
       return res.json(user);
     } catch (e) {
@@ -54,17 +53,18 @@ class UserController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response<ICommonResponse<IUser>>> {
+  ): Promise<Response<IUser>> {
     try {
       const { userId } = req.params;
       const user = req.body;
 
-      const updateUser = await User.updateOne({ _id: userId }, { ...user });
+      const updateUser = await User.findByIdAndUpdate(
+        userId,
+        { ...user },
+        { new: true }
+      );
 
-      return res.status(200).json({
-        message: "User updated",
-        data: updateUser,
-      });
+      return res.status(201).json({ updateUser });
     } catch (e) {
       next(e);
     }
@@ -73,15 +73,13 @@ class UserController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response<IMessage>> {
+  ): Promise<Response<void>> {
     try {
       const { userId } = req.params;
 
       await User.deleteOne({ _id: userId });
 
-      return res.status(200).json({
-        message: "User deleted",
-      });
+      return res.sendStatus(204);
     } catch (e) {
       next(e);
     }
