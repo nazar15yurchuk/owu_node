@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 
-import { User } from "../models/User.module";
-import { userService } from "../services/user.service";
-import { ICommonResponse } from "../types/common.types";
-import { IUser } from "../types/user.types";
+import { User } from "../models";
+import { userService } from "../services";
+import { ICommonResponse } from "../types";
+import { IUser } from "../types";
 
 class UserController {
   public async getAll(
