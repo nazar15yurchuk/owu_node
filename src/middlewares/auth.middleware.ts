@@ -18,13 +18,15 @@ class AuthMiddleware {
       }
 
       const jwtPayload = tokenService.checkToken(accessToken);
-      const tokenInfo = Token.findOne({ accessToken });
+      const tokenInfo = await Token.findOne({ accessToken }).populate(
+        "_user_id"
+      );
 
       if (!tokenInfo) {
         throw new ApiError("Token not valid", 401);
       }
 
-      req.res.locals = { tokenInfo, jwtPayload };
+      req.res.locals = { tokenInfo, jwtPayload, user: tokenInfo._user_id };
       next();
     } catch (e) {
       next(e);
