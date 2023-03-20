@@ -36,16 +36,29 @@ class EmailService {
     });
   }
 
-  public async sendMail(email: string, emailActions: EEmailActions) {
-    const templateInfo = allTemplates[emailActions];
+  public async sendMail(
+    email: string,
+    emailActions: EEmailActions,
+    locals: Record<string, string> = {}
+  ) {
+    try {
+      const templateInfo = allTemplates[emailActions];
+      locals.frontUrl = configs.FRONT_URL;
 
-    const html = await this.templateParser.render(templateInfo.templateName);
-    return this.transporter.sendMail({
-      from: "No reply",
-      to: email,
-      subject: templateInfo.subject,
-      html,
-    });
+      const html = await this.templateParser.render(
+        templateInfo.templateName,
+        locals
+      );
+
+      return this.transporter.sendMail({
+        from: "No reply",
+        to: email,
+        subject: templateInfo.subject,
+        html,
+      });
+    } catch (e) {
+      console.log(e.message);
+    }
   }
 }
 

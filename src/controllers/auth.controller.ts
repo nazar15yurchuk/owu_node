@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import { authService } from "../services";
-import { ITokenPair } from "../types";
+import { ITokenPair, ITokenPayload } from "../types";
 
 class AuthController {
   public async register(req: Request, res: Response, next: NextFunction) {
@@ -53,6 +53,65 @@ class AuthController {
       await authService.changePassword(user, oldPassword, newPassword);
 
       res.sendStatus(200);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { user } = req.res.locals;
+
+      await authService.forgotPassword(user);
+
+      res.json("Ok");
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async setForgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { password } = req.body;
+      const { tokenInfo } = req.res.locals;
+
+      await authService.setForgotPassword(password, tokenInfo._user_id);
+
+      res.sendStatus(200);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async sendActivateToken(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { user } = req.res.locals;
+      await authService.sendActivateToken(user);
+
+      res.sendStatus(204);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async activate(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { _id } = req.res.locals.jwtPayload as ITokenPayload;
+      await authService.activate(_id);
+
+      res.sendStatus(204);
     } catch (e) {
       next(e);
     }
