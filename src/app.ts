@@ -4,6 +4,7 @@ import * as mongoose from "mongoose";
 
 config();
 import { configs } from "./configs";
+import { cronRunner } from "./crons";
 import { ApiError } from "./errors";
 import { authRouter } from "./routers";
 import { userRouter } from "./routers";
@@ -28,5 +29,6 @@ console.log(process.env.PORT);
 
 app.listen(configs.PORT, async () => {
   await mongoose.connect(configs.DB_URL).then();
+  cronRunner();
   console.log(`Server has started on PORT ${configs.PORT}`);
 });

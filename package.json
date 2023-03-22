@@ -17,6 +17,8 @@
     "content-type": "^1.0.5",
     "cookie": "^0.5.0",
     "cookie-signature": "^1.0.6",
+    "cron": "^2.3.0",
+    "dayjs": "^1.11.7",
     "debug": "^2.6.9",
     "depd": "^2.0.0",
     "destroy": "^1.2.0",
@@ -97,6 +99,7 @@
   "homepage": "https://github.com/nazar15yurchuk/owu_node#readme",
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/cron": "^2.0.1",
     "@types/email-templates": "^10.0.1",
     "@types/express": "^4.17.17",
     "@types/jsonwebtoken": "^9.0.1",

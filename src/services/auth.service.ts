@@ -6,6 +6,7 @@ import {
 } from "../enums";
 import { ApiError } from "../errors";
 import { Action, Token, User } from "../models";
+import { OldPassword } from "../models/Old.password.module";
 import { ICredentials, ITokenPair, ITokenPayload, IUser } from "../types";
 import { emailService } from "./email.service";
 import { passwordService } from "./password.service";
@@ -123,16 +124,21 @@ class AuthService {
     } catch (e) {
       throw new ApiError(e.message, e.status);
     }
+    await OldPassword.create({ _user_id: user._id, password: user.password });
   }
 
-  public async setForgotPassword(password: string, id: string): Promise<void> {
+  public async setForgotPassword(
+    password: string,
+    id: string,
+    token: string
+  ): Promise<void> {
     try {
       const hashedPassword = await passwordService.hash(password);
       await Promise.all([
         User.updateOne({ _id: id }, { password: hashedPassword }),
 
-        Token.deleteMany({
-          _user_id: id,
+        Action.deleteOne({
+          actionToken: token,
           tokenType: EActionTokenType.forgot,
         }),
       ]);
