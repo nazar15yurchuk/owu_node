@@ -34,6 +34,7 @@ router.post(
 router.post(
   "/password/forgot",
   commonMiddleware.isBodyValid(UserValidator.emailValidator),
+  // commonMiddleware.isBodyValid(UserValidator.forgotUserPassword),
   userMiddleware.getUserDinamicallyOrThrow("email"),
   authController.forgotPassword
 );
@@ -41,6 +42,7 @@ router.post(
 router.put(
   `/password/forgot/:token`,
   authMiddleware.checkActionToken(EActionTokenType.forgot),
+  commonMiddleware.isBodyValid(UserValidator.forgotUserPassword),
   authMiddleware.checkOldPassword,
   authController.setForgotPassword
 );

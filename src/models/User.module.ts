@@ -2,6 +2,7 @@ import { model, Schema } from "mongoose";
 
 import { EGenders } from "../enums";
 import { EUserStatus } from "../enums";
+import { IUser, IUserModel } from "../types";
 
 const userSchema = new Schema(
   {
@@ -19,6 +20,10 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Password is required"],
     },
+    age: {
+      type: Number,
+      required: true,
+    },
     status: {
       type: String,
       enum: EUserStatus,
@@ -34,4 +39,20 @@ const userSchema = new Schema(
   }
 );
 
-export const User = model("user", userSchema);
+userSchema.virtual("nameWithSurname").get(function () {
+  return `${this.name} Yurchuk`;
+});
+
+userSchema.methods = {
+  nameWithAge() {
+    return `${this.name} is ${this.age} year old`;
+  },
+};
+
+userSchema.statics = {
+  findByName: async function (name: string): Promise<IUser[]> {
+    return this.find({ name });
+  },
+};
+
+export const User = model<IUser, IUserModel>("user", userSchema);
