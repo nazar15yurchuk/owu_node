@@ -12,10 +12,11 @@ class UserMiddleware {
   ): Promise<void> {
     try {
       const { userId } = req.params;
+
       const user = await User.findById(userId);
 
       if (!user) {
-        throw new ApiError("User not found", 404);
+        throw new ApiError("User not found", 422);
       }
 
       res.locals = { user };
@@ -25,7 +26,7 @@ class UserMiddleware {
     }
   }
 
-  public getDinamicallyAndThrow(
+  public getDynamicallyAndThrow(
     fieldName: string,
     from: "body" | "query" | "params" = "body",
     dbField: keyof IUser = "email"
@@ -33,11 +34,12 @@ class UserMiddleware {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
         const fieldValue = req[from][fieldName];
+
         const user = await User.findOne({ [dbField]: fieldValue });
 
         if (user) {
           throw new ApiError(
-            `User with ${fieldName} ${fieldValue} already exists`,
+            `User with ${fieldName} ${fieldValue} already exist`,
             409
           );
         }
@@ -49,7 +51,7 @@ class UserMiddleware {
     };
   }
 
-  public getUserDinamicallyOrThrow(
+  public getDynamicallyOrThrow(
     fieldName: string,
     from: "body" | "query" | "params" = "body",
     dbField: keyof IUser = "email"
@@ -57,10 +59,11 @@ class UserMiddleware {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
         const fieldValue = req[from][fieldName];
+
         const user = await User.findOne({ [dbField]: fieldValue });
 
         if (!user) {
-          throw new ApiError("User not found", 422);
+          throw new ApiError(`User not found`, 422);
         }
 
         req.res.locals = { user };

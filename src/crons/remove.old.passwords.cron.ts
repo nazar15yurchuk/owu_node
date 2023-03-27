@@ -2,7 +2,7 @@ import { CronJob } from "cron";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
-import { OldPassword } from "../models/Old.password.module";
+import { OldPassword } from "../models";
 
 dayjs.extend(utc);
 

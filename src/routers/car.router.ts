@@ -1,13 +1,17 @@
 import { Router } from "express";
 
-import { commonMiddleware } from "../middlewares";
-import { authMiddleware } from "../middlewares";
+import { carController } from "../controllers";
+import {
+  authMiddleware,
+  carMiddleware,
+  commonMiddleware,
+} from "../middlewares";
 import { CarValidator } from "../validators";
 
 const router = Router();
 
 router.post(
-  "/:carId",
+  "/",
   authMiddleware.checkAccessToken,
   commonMiddleware.isBodyValid(CarValidator.createCar),
   carController.create
@@ -16,23 +20,22 @@ router.post(
 router.get(
   "/:carId",
   authMiddleware.checkAccessToken,
-  commonMiddleware.isCarIdValid("carId"),
+  commonMiddleware.isIdValid("carId"),
   carMiddleware.getByIdOrThrow,
   carController.getById
 );
-
 router.put(
   "/:carId",
   authMiddleware.checkAccessToken,
-  commonMiddleware.isCarIdValid("carId"),
+  commonMiddleware.isIdValid("carId"),
   commonMiddleware.isBodyValid(CarValidator.updateCar),
+  carMiddleware.getByIdOrThrow,
   carController.update
 );
-
 router.delete(
   "/:carId",
   authMiddleware.checkAccessToken,
-  commonMiddleware.isCarIdValid("carId"),
+  commonMiddleware.isIdValid("carId"),
   carMiddleware.getByIdOrThrow,
   carController.delete
 );

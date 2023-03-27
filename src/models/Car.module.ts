@@ -1,6 +1,5 @@
 import { model, Schema, Types } from "mongoose";
 
-import { IUser, IUserModel } from "../types";
 import { User } from "./User.module";
 
 const carSchema = new Schema(
@@ -13,9 +12,9 @@ const carSchema = new Schema(
     },
     model: {
       type: String,
-      required: true,
       trim: true,
       lowercase: true,
+      required: true,
     },
     year: {
       type: Number,
@@ -32,5 +31,4 @@ const carSchema = new Schema(
     timestamps: true,
   }
 );
-
-export const Car = model<IUser, IUserModel>("car", carSchema);
+export const Car = model("car", carSchema);

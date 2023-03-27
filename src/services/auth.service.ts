@@ -1,32 +1,25 @@
-import {
-  EActionTokenType,
-  EEmailActions,
-  ESmsActionEnum,
-  EUserStatus,
-} from "../enums";
+import { EEmailActions, EUserStatus } from "../enums";
+import { EActionTokenType } from "../enums";
 import { ApiError } from "../errors";
 import { Action, Token, User } from "../models";
-import { OldPassword } from "../models/Old.password.module";
+import { OldPassword } from "../models";
 import { ICredentials, ITokenPair, ITokenPayload, IUser } from "../types";
 import { emailService } from "./email.service";
 import { passwordService } from "./password.service";
-import { smsService } from "./sms.service";
 import { tokenService } from "./token.service";
 
 class AuthService {
-  public async register(body: IUser) {
+  public async register(body: IUser): Promise<void> {
     try {
       const { password } = body;
       const hashedPassword = await passwordService.hash(password);
-
       await User.create({
         ...body,
         password: hashedPassword,
       });
 
       await Promise.all([
-        smsService.sendSms(body.phone, ESmsActionEnum.WELCOME),
-
+        // smsService.sendSms(body.phone, ESmsActionEnum.WELCOME),
         emailService.sendMail(body.email, EEmailActions.WELCOME),
       ]);
     } catch (e) {
@@ -43,12 +36,14 @@ class AuthService {
         credentials.password,
         user.password
       );
+
       if (!isMatched) {
-        throw new ApiError("Invalid email or password", 404);
+        throw new ApiError("Invalid email or password", 409);
       }
+
       const tokenPair = tokenService.generateTokenPair({
-        name: user.name,
         _id: user._id,
+        name: user.name,
       });
 
       await Token.create({
@@ -61,7 +56,6 @@ class AuthService {
       throw new ApiError(e.message, e.status);
     }
   }
-
   public async refresh(
     tokenInfo: ITokenPair,
     jwtPayload: ITokenPayload
@@ -84,11 +78,13 @@ class AuthService {
   }
 
   public async changePassword(
-    user: IUser,
+    userId: string,
     oldPassword: string,
     newPassword: string
   ): Promise<void> {
     try {
+      const user = await User.findById(userId);
+
       const isMatched = await passwordService.compare(
         oldPassword,
         user.password
@@ -111,7 +107,6 @@ class AuthService {
         { _id: user._id },
         EActionTokenType.forgot
       );
-
       await Action.create({
         actionToken,
         tokenType: EActionTokenType.forgot,
@@ -121,10 +116,10 @@ class AuthService {
       await emailService.sendMail(user.email, EEmailActions.FORGOT_PASSWORD, {
         token: actionToken,
       });
+      await OldPassword.create({ _user_id: user._id, password: user.password });
     } catch (e) {
       throw new ApiError(e.message, e.status);
     }
-    await OldPassword.create({ _user_id: user._id, password: user.password });
   }
 
   public async setForgotPassword(
@@ -134,14 +129,12 @@ class AuthService {
   ): Promise<void> {
     try {
       const hashedPassword = await passwordService.hash(password);
-      await Promise.all([
-        User.updateOne({ _id: id }, { password: hashedPassword }),
 
-        Action.deleteOne({
-          actionToken: token,
-          tokenType: EActionTokenType.forgot,
-        }),
-      ]);
+      await User.updateOne({ _id: id }, { password: hashedPassword });
+      await Action.deleteOne({
+        actionToken: token,
+        tokenType: EActionTokenType.forgot,
+      });
     } catch (e) {
       throw new ApiError(e.message, e.status);
     }
@@ -153,7 +146,6 @@ class AuthService {
         { _id: user._id },
         EActionTokenType.activate
       );
-
       await Action.create({
         actionToken,
         tokenType: EActionTokenType.activate,
@@ -170,15 +162,16 @@ class AuthService {
 
   public async activate(userId: string): Promise<void> {
     try {
-      await User.updateOne(
-        { _id: userId },
-        { $set: { status: EUserStatus.active } }
-      );
-
-      await Token.deleteMany({
-        _user_id: userId,
-        tokenType: EActionTokenType.activate,
-      });
+      await Promise.all([
+        User.updateOne(
+          { _id: userId },
+          { $set: { status: EUserStatus.active } }
+        ),
+        Token.deleteMany({
+          _user_id: userId,
+          tokenType: EActionTokenType.activate,
+        }),
+      ]);
     } catch (e) {
       throw new ApiError(e.message, e.status);
     }

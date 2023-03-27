@@ -5,13 +5,12 @@ import { isObjectIdOrHexString } from "mongoose";
 import { ApiError } from "../errors";
 
 class CommonMiddleware {
-  public isUserIdValid(idField: string, from: "params" | "query" = "params") {
+  public isIdValid(idField: string, from: "params" | "query" = "params") {
     return (req: Request, res: Response, next: NextFunction) => {
       try {
         if (!isObjectIdOrHexString(req[from][idField])) {
           throw new ApiError("ID not valid", 400);
         }
-
         next();
       } catch (e) {
         next(e);

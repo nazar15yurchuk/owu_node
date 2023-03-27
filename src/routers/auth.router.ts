@@ -14,13 +14,14 @@ const router = Router();
 router.post(
   "/register",
   commonMiddleware.isBodyValid(UserValidator.createUser),
-  userMiddleware.getDinamicallyAndThrow("email"),
+  userMiddleware.getDynamicallyAndThrow("email"),
   authController.register
 );
+
 router.post(
   "/login",
   commonMiddleware.isBodyValid(UserValidator.loginUser),
-  userMiddleware.getUserDinamicallyOrThrow("email"),
+  userMiddleware.getDynamicallyOrThrow("email"),
   authController.login
 );
 
@@ -34,15 +35,13 @@ router.post(
 router.post(
   "/password/forgot",
   commonMiddleware.isBodyValid(UserValidator.emailValidator),
-  // commonMiddleware.isBodyValid(UserValidator.forgotUserPassword),
-  userMiddleware.getUserDinamicallyOrThrow("email"),
+  userMiddleware.getDynamicallyOrThrow("email"),
   authController.forgotPassword
 );
 
 router.put(
   `/password/forgot/:token`,
   authMiddleware.checkActionToken(EActionTokenType.forgot),
-  commonMiddleware.isBodyValid(UserValidator.forgotUserPassword),
   authMiddleware.checkOldPassword,
   authController.setForgotPassword
 );
@@ -50,7 +49,7 @@ router.put(
 router.post(
   "/activate",
   commonMiddleware.isBodyValid(UserValidator.emailValidator),
-  userMiddleware.getUserDinamicallyOrThrow("email"),
+  userMiddleware.getDynamicallyOrThrow("email"),
   authController.sendActivateToken
 );
 

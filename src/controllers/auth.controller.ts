@@ -30,6 +30,7 @@ class AuthController {
       next(e);
     }
   }
+
   public async refresh(
     req: Request,
     res: Response,
@@ -37,6 +38,7 @@ class AuthController {
   ): Promise<Response<ITokenPair>> {
     try {
       const { tokenInfo, jwtPayload } = req.res.locals;
+
       const tokenPair = await authService.refresh(tokenInfo, jwtPayload);
 
       return res.status(200).json(tokenPair);
@@ -47,10 +49,14 @@ class AuthController {
 
   public async changePassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const { user } = req.res.locals;
+      const { tokenInfo } = req.res.locals;
       const { oldPassword, newPassword } = req.body;
 
-      await authService.changePassword(user, oldPassword, newPassword);
+      await authService.changePassword(
+        tokenInfo._user_id,
+        oldPassword,
+        newPassword
+      );
 
       res.sendStatus(200);
     } catch (e) {
@@ -58,13 +64,16 @@ class AuthController {
     }
   }
 
-  public async forgotPassword(req: Request, res: Response, next: NextFunction) {
+  public async forgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const { user } = req.res.locals;
-
       await authService.forgotPassword(user);
 
-      res.json("Ok");
+      res.sendStatus(200);
     } catch (e) {
       next(e);
     }

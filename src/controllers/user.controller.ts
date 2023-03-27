@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { User } from "../models";
 import { IQuery, userService } from "../services";
-import { ICommonResponse } from "../types";
 import { IUser } from "../types";
 
 class UserController {
@@ -13,7 +11,7 @@ class UserController {
   ): Promise<Response<IUser[]>> {
     try {
       const users = await userService.getWithPagination(
-        req.query as unknown as IQuery
+        req.query as unknown /* я хз шо це таке */ as IQuery
       );
 
       return res.json(users);
@@ -21,6 +19,7 @@ class UserController {
       next(e);
     }
   }
+
   public async getById(
     req: Request,
     res: Response,
@@ -28,49 +27,28 @@ class UserController {
   ): Promise<Response<IUser>> {
     try {
       const { user } = res.locals;
-
       return res.json(user);
     } catch (e) {
       next(e);
     }
   }
-  public async create(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response<ICommonResponse<IUser>>> {
-    try {
-      const body = req.body;
-      const user = await User.create({ ...body });
 
-      return res.status(201).json({
-        message: "User created!",
-        data: user,
-      });
-    } catch (e) {
-      next(e);
-    }
-  }
   public async update(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<Response<IUser>> {
     try {
-      const { userId } = req.params;
-      const user = req.body;
+      const { params, body } = req;
 
-      const updateUser = await User.findByIdAndUpdate(
-        userId,
-        { ...user },
-        { new: true }
-      );
+      const updatedUser = await userService.update(params.userId, body);
 
-      return res.status(201).json({ updateUser });
+      return res.status(201).json(updatedUser);
     } catch (e) {
       next(e);
     }
   }
+
   public async delete(
     req: Request,
     res: Response,
@@ -79,7 +57,7 @@ class UserController {
     try {
       const { userId } = req.params;
 
-      await User.deleteOne({ _id: userId });
+      await userService.delete(userId);
 
       return res.sendStatus(204);
     } catch (e) {
