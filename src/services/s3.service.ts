@@ -1,6 +1,10 @@
 import { extname } from "node:path";
 
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import { UploadedFile } from "express-fileupload";
 import { v4 } from "uuid";
 
@@ -33,7 +37,16 @@ class S3Service {
         ACL: configs.AWS_S3_ACL,
       })
     );
-    return `${configs.AWS_S3_URL}/${filePath}`;
+    return filePath;
+  }
+
+  public async deletePhoto(filePath: string): Promise<void> {
+    await this.client.send(
+      new DeleteObjectCommand({
+        Bucket: configs.AWS_S3_NAME,
+        Key: filePath,
+      })
+    );
   }
 
   private buildPath(

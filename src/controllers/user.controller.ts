@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { UploadedFile } from "express-fileupload";
 
+import { userMapper } from "../mappers";
 import { IQuery, userService } from "../services";
 import { IUser } from "../types";
 
@@ -11,11 +12,11 @@ class UserController {
     next: NextFunction
   ): Promise<Response<IUser[]>> {
     try {
-      const users = await userService.getWithPagination(
+      const response = await userService.getWithPagination(
         req.query as unknown /* я хз шо це таке */ as IQuery
       );
 
-      return res.json(users);
+      return res.json(response);
     } catch (e) {
       next(e);
     }
@@ -28,7 +29,10 @@ class UserController {
   ): Promise<Response<IUser>> {
     try {
       const { user } = res.locals;
-      return res.json(user);
+
+      const response = userMapper.toResponse(user);
+
+      return res.json(response);
     } catch (e) {
       next(e);
     }
@@ -44,7 +48,9 @@ class UserController {
 
       const updatedUser = await userService.update(params.userId, body);
 
-      return res.status(201).json(updatedUser);
+      const response = userMapper.toResponse(updatedUser);
+
+      return res.status(201).json(response);
     } catch (e) {
       next(e);
     }
@@ -69,15 +75,34 @@ class UserController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response<void>> {
+  ): Promise<Response<IUser>> {
     try {
-      const { userId } = req.params;
+      const userEntity = res.locals.user as IUser;
       const avatar = req.files.avatar as UploadedFile;
 
-      console.log(req.files);
-      const user = await userService.uploadAvatar(avatar, userId);
+      const user = await userService.uploadAvatar(avatar, userEntity);
 
-      return res.status(201).json(user);
+      const response = userMapper.toResponse(user);
+
+      return res.status(201).json(response);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async deleteAvatar(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response<IUser>> {
+    try {
+      const userEntity = res.locals.user as IUser;
+
+      const user = await userService.deleteAvatar(userEntity);
+
+      const response = userMapper.toResponse(user);
+
+      return res.status(201).json(response);
     } catch (e) {
       next(e);
     }

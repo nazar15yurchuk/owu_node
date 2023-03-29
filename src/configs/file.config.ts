@@ -4,5 +4,5 @@ export const avatarConfig = {
     "image/png",
     "image/gif",
   ],
-  MAX_SIZE: 10 * 1024 * 1024, // 2 MB
+  MAX_SIZE: 10 * 1024 * 1024, // 10 MB
 };
