@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
+import { UploadedFile } from "express-fileupload";
 
 import { IQuery, userService } from "../services";
 import { IUser } from "../types";
-import {UploadedFile} from "express-fileupload";
 
 class UserController {
   public async getAll(
