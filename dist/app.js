@@ -28,16 +28,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = require("dotenv");
 const express_1 = __importDefault(require("express"));
+const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const mongoose = __importStar(require("mongoose"));
 (0, dotenv_1.config)();
 const configs_1 = require("./configs");
 const crons_1 = require("./crons");
 const routers_1 = require("./routers");
-const routers_2 = require("./routers");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-app.use("/users", routers_2.userRouter);
+app.use((0, express_fileupload_1.default)());
+app.use("/users", routers_1.userRouter);
 app.use("/cars", routers_1.carRouter);
 app.use("/auth", routers_1.authRouter);
 app.use((err, req, res, next) => {

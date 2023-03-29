@@ -7,6 +7,7 @@ import {
   userMiddleware,
 } from "../middlewares";
 import { UserValidator } from "../validators";
+import {fileMiddleware} from "../middlewares/file.middleware";
 
 const router = Router();
 
@@ -26,6 +27,14 @@ router.put(
   commonMiddleware.isBodyValid(UserValidator.updateUser),
   userMiddleware.getByIdOrThrow,
   userController.update
+);
+router.put(
+  "/:userId/avatar",
+  authMiddleware.checkAccessToken,
+  commonMiddleware.isIdValid("userId"),
+  fileMiddleware.isAvatarValid,
+  userMiddleware.getByIdOrThrow,
+  userController.uploadAvatar
 );
 router.delete(
   "/:userId",

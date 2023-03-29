@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import { IQuery, userService } from "../services";
 import { IUser } from "../types";
+import {UploadedFile} from "express-fileupload";
 
 class UserController {
   public async getAll(
@@ -60,6 +61,23 @@ class UserController {
       await userService.delete(userId);
 
       return res.sendStatus(204);
+    } catch (e) {
+      next(e);
+    }
+  }
+  public async uploadAvatar(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response<void>> {
+    try {
+      const { userId } = req.params;
+      const avatar = req.files.avatar as UploadedFile;
+
+      console.log(req.files);
+      const user = await userService.uploadAvatar(avatar, userId);
+
+      return res.status(201).json(user);
     } catch (e) {
       next(e);
     }

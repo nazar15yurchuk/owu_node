@@ -28,6 +28,9 @@ const userSchema = new Schema(
       type: String,
       enum: EGenders,
     },
+    avatar: {
+      type: String,
+    },
     status: {
       type: String,
       enum: EUserStatus,
