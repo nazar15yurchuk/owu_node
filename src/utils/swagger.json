@@ -1,0 +1,45 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "OWUNODE",
+    "description": "Node module",
+    "contact": {
+      "email": "nazaryurchuk15@gmail.com"
+    }
+  },
+  "paths": {
+    "/cars/{carId}": {
+      "get": {
+        "tags": ["Cars"],
+        "summary": "Get car by carId",
+        "operationId": "get by id",
+        "responses": {
+          "200": {
+            "description": "everything is good"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Cars"],
+        "summary": "Put car by carId",
+        "operationId": "put by id",
+        "responses": {
+          "200": {
+            "description": "everything is good"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Cars"],
+        "summary": "Delete car by carId",
+        "operationId": "Delete by id",
+        "responses": {
+          "200": {
+            "description": "everything is good"
+          }
+        }
+      }
+    }
+  }
+}

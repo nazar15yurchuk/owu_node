@@ -33,8 +33,8 @@
      "removeComments": true,                           /* Disable emitting comments. */
      "noImplicitAny": true,                            /* Enable error reporting for expressions and declarations with an implied 'any' type. */
      "noUnusedLocals": true,                           /* Enable error reporting when local variables aren't read. */
-    "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
-
+      "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
+      "resolveJsonModule": true
 
     // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
     // "paths": {},                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
