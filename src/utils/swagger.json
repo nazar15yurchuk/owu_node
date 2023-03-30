@@ -2,42 +2,110 @@
   "swagger": "2.0",
   "info": {
     "version": "1.0",
-    "title": "OWUNODE",
-    "description": "Node module",
+    "title": "SEPT-2022",
+    "description": "NODEJS MODULE FOR SEPT-2022",
     "contact": {
-      "email": "nazaryurchuk15@gmail.com"
+      "email": "k0styalopuh3@gmail.com"
     }
   },
   "paths": {
-    "/cars/{carId}": {
+    "/cars/{cardId}": {
       "get": {
-        "tags": ["Cars"],
-        "summary": "Get car by carId",
-        "operationId": "get by id",
+        "tags": [
+          "Cars"
+        ],
+        "summary": "get car by id",
+        "operationId": "getCarById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "fdkslfjdsklfjsdkjfdsljfds"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "everything is good"
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Car"
+            }
+          },
+          "400": {
+            "description": "no token provided"
           }
         }
       },
       "put": {
-        "tags": ["Cars"],
-        "summary": "Put car by carId",
-        "operationId": "put by id",
+        "tags": [
+          "Cars"
+        ],
         "responses": {
-          "200": {
-            "description": "everything is good"
-          }
+          "200": {}
         }
       },
       "delete": {
-        "tags": ["Cars"],
-        "summary": "Delete car by carId",
-        "operationId": "Delete by id",
+        "tags": [
+          "Cars"
+        ],
         "responses": {
-          "200": {
-            "description": "everything is good"
-          }
+          "200": {}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Car": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "brand": {
+          "type": "string",
+          "example": "BMW"
+        },
+        "model": {
+          "type": "string",
+          "example": "M5"
+        },
+        "year": {
+          "type": "number",
+          "example": "2015"
+        },
+        "user": {
+          "type": "object",
+          "$ref": "#definitions/User"
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "brand": {
+          "type": "string",
+          "example": "BMW"
+        },
+        "model": {
+          "type": "string",
+          "example": "M5"
+        },
+        "year": {
+          "type": "number",
+          "example": "2015"
+        },
+        "user": {
+          "type": "object",
+          "$ref": "#definitions/User"
         }
       }
     }
